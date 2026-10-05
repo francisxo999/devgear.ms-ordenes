@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: ms-ordenes
+
+  datasource:
+    url: jdbc:mysql://db-ordenes:3306/ordenes_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&useUnicode=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/e5372bf0-c5e3-4286-887c-79069f209c1f/v2.0
+
+  # RabbitMQ corre como contenedor vecino, en la misma instancia que este servicio
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+server:
+  port: 8084
+
+# Para traer el carrito del usuario al momento de crear la orden.
+# Default pensado para pruebas LOCALES (mismo docker-compose que ms-carrito).
+# En producción (EC2, instancias separadas) se sobreescribe con la IP pública real
+# vía la variable de entorno CARRITO_API_BASE_URL, igual que hicimos en ms-carrito.
+carrito:
+  api:
+    base-url: ${CARRITO_API_BASE_URL:http://app-carrito:8082}
