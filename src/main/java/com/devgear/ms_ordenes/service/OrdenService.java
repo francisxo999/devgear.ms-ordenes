@@ -57,10 +57,19 @@ public class OrdenService {
 
         Orden guardada = ordenRepository.save(orden);
 
-        // Una vez guardada la orden, el carrito ya cumplió su función
-        carritoClient.vaciarCarrito(bearerToken);
-
+        // Publicar el evento es lo crítico (Productos/Notificaciones/Despachos
+        // dependen de esto) -- va primero y sin red de seguridad: si esto falla,
+        // sí queremos que la operación completa falle.
         publicarEvento(guardada, email);
+
+        // Vaciar el carrito es secundario: si falla, no debe tumbar una orden
+        // que ya se creó y ya se publicó correctamente. En el peor caso, el
+        // usuario ve productos "viejos" en su carrito y los borra a mano.
+        try {
+            carritoClient.vaciarCarrito(bearerToken);
+        } catch (Exception ex) {
+            System.err.println("No se pudo vaciar el carrito tras crear la orden " + guardada.getId() + ": " + ex.getMessage());
+        }
 
         return mapToDTO(guardada);
     }
