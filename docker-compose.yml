@@ -1,0 +1,55 @@
+services:
+  db-ordenes:
+    image: mysql:8.0
+    container_name: mysql-ordenes
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ordenes_db
+    volumes:
+      - db_ordenes_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:4.2-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app-ordenes:
+    build: .
+    container_name: devgear-ms-ordenes-1
+    restart: always
+    ports:
+      - "8084:8084"
+    depends_on:
+      db-ordenes:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-ordenes:3306/ordenes_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      CARRITO_API_BASE_URL: ${CARRITO_API_BASE_URL:-http://172.31.31.247:8082}
+      RABBITMQ_HOST: rabbitmq
+
+volumes:
+  db_ordenes_data:
+  rabbitmq_data:
