@@ -74,6 +74,16 @@ public class OrdenService {
         return mapToDTO(guardada);
     }
 
+    // Lo llama el listener cuando ms-despachos avisa que el despacho cambió de estado
+    // (PENDIENTE / EN_TRANSITO / ENTREGADO). Así el cliente y el admin ven el estado real.
+    public void sincronizarEstado(Long ordenId, String estado) {
+        ordenRepository.findById(ordenId).ifPresentOrElse(orden -> {
+            orden.setEstado(estado);
+            ordenRepository.save(orden);
+            System.out.println("Orden " + ordenId + " ahora está " + estado);
+        }, () -> System.err.println("Llegó un estado para la orden " + ordenId + " pero no existe"));
+    }
+
     public List<OrdenResponseDTO> obtenerOrdenesDelUsuario(String usuarioId) {
         return ordenRepository.findByUsuarioId(usuarioId).stream()
                 .map(this::mapToDTO)

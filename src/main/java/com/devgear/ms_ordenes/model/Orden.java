@@ -22,7 +22,7 @@ public class Orden {
     private LocalDateTime fecha;
 
     @Column(nullable = false)
-    private String estado; // PENDIENTE (único estado que maneja este servicio por ahora)
+    private String estado; // PENDIENTE al crearse; luego sigue al despacho: EN_TRANSITO, ENTREGADO
 
     @Column(nullable = false)
     private BigDecimal total;
