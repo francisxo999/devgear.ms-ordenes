@@ -14,12 +14,14 @@ public record OrdenCreadaEvento(
     String email,
     LocalDateTime fecha,
     BigDecimal total,
+    String metodoPago,
     List<ItemEvento> items
 ) {
     public record ItemEvento(
         Long productoId,
         String nombreProducto,
         Integer cantidad,
-        BigDecimal precioUnitario
+        BigDecimal precioUnitario,
+        String imagenUrl
     ) {}
 }

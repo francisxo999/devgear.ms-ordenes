@@ -30,7 +30,7 @@ public class OrdenService {
         this.eventPublisher = eventPublisher;
     }
 
-    public OrdenResponseDTO crearOrden(String usuarioId, String email, String bearerToken) {
+    public OrdenResponseDTO crearOrden(String usuarioId, String email, String bearerToken, String metodoPago) {
         List<ItemCarritoDTO> itemsCarrito = carritoClient.obtenerCarrito(bearerToken);
 
         if (itemsCarrito.isEmpty()) {
@@ -41,6 +41,7 @@ public class OrdenService {
         orden.setUsuarioId(usuarioId);
         orden.setFecha(LocalDateTime.now());
         orden.setEstado("PENDIENTE");
+        orden.setMetodoPago(metodoPago);
 
         BigDecimal total = BigDecimal.ZERO;
         for (ItemCarritoDTO itemCarrito : itemsCarrito) {
@@ -48,6 +49,7 @@ public class OrdenService {
             item.setProductoId(itemCarrito.productoId());
             item.setNombreProducto(itemCarrito.nombreProducto());
             item.setPrecioUnitario(itemCarrito.precioUnitario());
+            item.setImagenUrl(itemCarrito.imagenUrl());
             item.setCantidad(itemCarrito.cantidad());
             item.setSubtotal(itemCarrito.subtotal());
             orden.agregarItem(item);
@@ -111,11 +113,11 @@ public class OrdenService {
     private void publicarEvento(Orden orden, String email) {
         List<OrdenCreadaEvento.ItemEvento> items = orden.getItems().stream()
                 .map(i -> new OrdenCreadaEvento.ItemEvento(
-                        i.getProductoId(), i.getNombreProducto(), i.getCantidad(), i.getPrecioUnitario()))
+                        i.getProductoId(), i.getNombreProducto(), i.getCantidad(), i.getPrecioUnitario(), i.getImagenUrl()))
                 .toList();
 
         OrdenCreadaEvento evento = new OrdenCreadaEvento(
-                orden.getId(), orden.getUsuarioId(), email, orden.getFecha(), orden.getTotal(), items);
+                orden.getId(), orden.getUsuarioId(), email, orden.getFecha(), orden.getTotal(), orden.getMetodoPago(), items);
 
         eventPublisher.publicarOrdenCreada(evento);
     }

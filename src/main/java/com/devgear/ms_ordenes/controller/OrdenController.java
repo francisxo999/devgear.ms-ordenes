@@ -1,5 +1,6 @@
 package com.devgear.ms_ordenes.controller;
 
+import com.devgear.ms_ordenes.dto.CrearOrdenRequestDTO;
 import com.devgear.ms_ordenes.dto.OrdenResponseDTO;
 import com.devgear.ms_ordenes.service.OrdenService;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,10 @@ public class OrdenController {
     // Crea la orden a partir del carrito actual del usuario (sin body: no hace
     // falta mandar nada, se lee todo del carrito + del token).
     @PostMapping
-    public ResponseEntity<OrdenResponseDTO> crearOrden(JwtAuthenticationToken auth) {
-        OrdenResponseDTO orden = ordenService.crearOrden(usuarioId(auth), email(auth), bearerToken(auth));
+    public ResponseEntity<OrdenResponseDTO> crearOrden(JwtAuthenticationToken auth,
+                                                       @RequestBody(required = false) CrearOrdenRequestDTO body) {
+        String metodoPago = body == null ? null : body.metodoPago();
+        OrdenResponseDTO orden = ordenService.crearOrden(usuarioId(auth), email(auth), bearerToken(auth), metodoPago);
         return ResponseEntity.status(HttpStatus.CREATED).body(orden);
     }
 

@@ -27,6 +27,10 @@ public class ItemOrden {
     @Column(nullable = false)
     private BigDecimal precioUnitario;
 
+    // Foto del producto al momento de la compra (para la boleta del correo). Puede ser null.
+    @Column(length = 1000)
+    private String imagenUrl;
+
     @Column(nullable = false)
     private Integer cantidad;
 
@@ -73,6 +77,14 @@ public class ItemOrden {
 
     public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public Integer getCantidad() {

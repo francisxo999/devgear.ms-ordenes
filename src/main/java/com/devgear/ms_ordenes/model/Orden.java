@@ -27,12 +27,24 @@ public class Orden {
     @Column(nullable = false)
     private BigDecimal total;
 
+    // Texto legible del medio de pago, ej. "Webpay Plus · Tarjeta de crédito terminada en 6623". Puede ser null.
+    @Column(length = 200)
+    private String metodoPago;
+
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ItemOrden> items = new ArrayList<>();
 
     public Orden() {}
 
     // Getters y setters
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
 
     public Long getId() {
         return id;

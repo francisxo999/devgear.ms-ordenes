@@ -9,5 +9,6 @@ public record ItemCarritoDTO(
     String nombreProducto,
     BigDecimal precioUnitario,
     Integer cantidad,
-    BigDecimal subtotal
+    BigDecimal subtotal,
+    String imagenUrl
 ) {}
